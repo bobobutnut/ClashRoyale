@@ -1,9 +1,10 @@
 import requests
 from flask import Flask, render_template, abort
 import os
+from dotenv import load_dotenv
 
-API_TOKEN = os.getenv("MY_API_KEY")
-
+load_dotenv()
+API_TOKEN = os.getenv("API_KEY")
 app = Flask(__name__)
 app.jinja_env.globals.update(round=round)
 
@@ -12,7 +13,7 @@ app.jinja_env.globals.update(round=round)
 def get_data(id):
     # URL-encode the player ID to handle the '#' character
 
-    url = f"https://api.clashroyale.com/v1/players/%23" + id
+    url = f"https://proxy.royaleapi.dev/v1/players/%23" + id
     headers = {
         'Accept': 'application/json',
         'Authorization': f'Bearer {API_TOKEN}'
