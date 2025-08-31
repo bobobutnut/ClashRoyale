@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clash Royale Battle Log</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .card-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background: #fafafa;
+        }
+        .card img {
+            max-width: 100px;
+            display: block;
+            margin: 0 auto;
+        }
+        .team, .opponent {
+            padding: 15px;
+            border-left: 4px solid;
+        }
+        .team { border-color: #007bff; }
+        .opponent { border-color: #dc3545; }
+        .battle {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Clash Royale Battle Log</h1>
+        {% for battle in battles %}
+        <div class="battle">
+            <div class="section">
+                <h2>Battle Details</h2>
+                <p><strong>Type:</strong> {{ battle.type }}</p>
+                <p><strong>Battle Time:</strong> {{ battle.battleTime | replace('T', ' ') | replace('.000Z', '') }}</p>
+                <p><strong>Arena:</strong> {{ battle.arena.name }} (ID: {{ battle.arena.id }})</p>
+                <p><strong>Game Mode:</strong> {{ battle.gameMode.name }} (ID: {{ battle.gameMode.id }})</p>
+                <p><strong>Deck Selection:</strong> {{ battle.deckSelection }}</p>
+                <p><strong>League Number:</strong> {{ battle.leagueNumber | default('N/A') }}</p>
+                <p><strong>Is Ladder Tournament:</strong> {{ battle.isLadderTournament }}</p>
+                <p><strong>Is Hosted Match:</strong> {{ battle.isHostedMatch }}</p>
+            </div>
+
+            {% for team in battle.team %}
+            <div class="section team">
+                <h2>Player: {{ team.name }}</h2>
+                <p><strong>Tag:</strong> {{ team.tag }}</p>
+                <p><strong>Starting Trophies:</strong> {{ team.startingTrophies }}</p>
+                <p><strong>Trophy Change:</strong> {{ team.trophyChange }}</p>
+                <p><strong>Crowns:</strong> {{ team.crowns }}</p>
+                <p><strong>King Tower Hit Points:</strong> {{ team.kingTowerHitPoints }}</p>
+                        {% if team.princessTowersHitPoints %}
+                            <p><strong>Princess Towers Hit Points:</strong> {{ team.princessTowersHitPoints | default('Not available') }}</p>
+                        {% else %}
+                            <p>Princess Tower Destroyed.</p>
+                        {% endif %}
+                <p><strong>Clan:</strong> {{ team.clan.name if team.clan else 'No clan' }} (Tag: {{ team.clan.tag if team.clan else 'N/A' }}, Badge ID: {{ team.clan.badgeId if team.clan else 'N/A' }})</p>
+                <p><strong>Elixir Leaked:</strong> {{ team.elixirLeaked | round(2) }}</p>
+
+                <h3>Cards</h3>
+                <div class="card-list">
+                    {% for card in team.cards %}
+                    <div class="card">
+                        <img src="{{ card.iconUrls.medium }}" alt="{{ card.name }}">
+                        <p><strong>{{ card.name }}</strong> ({{ card.rarity | capitalize }}, Level {{ card.level }}{% if card.starLevel %}, Star Level {{ card.starLevel }}{% endif %}{% if card.evolutionLevel %}, Evolution Level {{ card.evolutionLevel }}{% endif %}, Elixir: {{ card.elixirCost }})</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <h3>Support Cards</h3>
+                <div class="card-list">
+                    {% for card in team.supportCards %}
+                    <div class="card">
+                        <img src="{{ card.iconUrls.medium }}" alt="{{ card.name }}">
+                        <p><strong>{{ card.name }}</strong> ({{ card.rarity | capitalize }}, Level {{ card.level }})</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+            {% for opponent in battle.opponent %}
+            <div class="section opponent">
+                <h2>Opponent: {{ opponent.name }}</h2>
+                <p><strong>Tag:</strong> {{ opponent.tag }}</p>
+                <p><strong>Starting Trophies:</strong> {{ opponent.startingTrophies }}</p>
+                <p><strong>Trophy Change:</strong> {{ opponent.trophyChange }}</p>
+                <p><strong>Crowns:</strong> {{ opponent.crowns }}</p>
+                <p><strong>King Tower Hit Points:</strong> {{ opponent.kingTowerHitPoints }}</p>
+                <p><strong>Princess Towers Hit Points:</strong> {{ opponent.princessTowersHitPoints | default('Not available') }}</p>
+                <p><strong>Clan:</strong> {{ opponent.clan.name if opponent.clan else 'No clan' }} (Tag: {{ opponent.clan.tag if opponent.clan else 'N/A' }}, Badge ID: {{ opponent.clan.badgeId if opponent.clan else 'N/A' }})</p>
+                <p><strong>Elixir Leaked:</strong> {{ opponent.elixirLeaked | round(2) }}</p>
+
+                <h3>Cards</h3>
+                <div class="card-list">
+                    {% for card in opponent.cards %}
+                    <div class="card">
+                        <img src="{{ card.iconUrls.medium }}" alt="{{ card.name }}">
+                        <p><strong>{{ card.name }}</strong> ({{ card.rarity | capitalize }}, Level {{ card.level }}{% if card.starLevel %}, Star Level {{ card.starLevel }}{% endif %}{% if card.evolutionLevel %}, Evolution Level {{ card.evolutionLevel }}{% endif %}, Elixir: {{ card.elixirCost }})</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <h3>Support Cards</h3>
+                <div class="card-list">
+                    {% for card in opponent.supportCards %}
+                    <div class="card">
+                        <img src="{{ card.iconUrls.medium }}" alt="{{ card.name }}">
+                        <p><strong>{{ card.name }}</strong> ({{ card.rarity | capitalize }}, Level {{ card.level }})</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

@@ -10,9 +10,8 @@ app.jinja_env.globals.update(round=round)
 
 
 @app.route("/players/<string:id>")
-def get_data(id):
+def get_player_data(id):
     # URL-encode the player ID to handle the '#' character
-
     url = f"https://proxy.royaleapi.dev/v1/players/%23" + id
     headers = {
         'Accept': 'application/json',
@@ -37,6 +36,30 @@ def get_data(id):
 
     except requests.exceptions.RequestException as e:
         # Handle network or connection errors
+        abort(500, description=f"Error connecting to the API: {str(e)}")
+
+
+@app.route("/log/<string:id>")
+def get_battle_data(id):
+    url = f"https://proxy.royaleapi.dev/v1/players/%23{id}/battlelog"
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': f'Bearer {API_TOKEN}'
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            return render_template("battle_log.html", battles=data)
+        elif response.status_code == 404:
+            abort(404, description="Battle log not found")
+        elif response.status_code == 403:
+            abort(403, description="Invalid API token or access denied")
+        else:
+            abort(response.status_code, description=f"API request failed with status {response.status_code}")
+
+    except requests.exceptions.RequestException as e:
         abort(500, description=f"Error connecting to the API: {str(e)}")
 
 
