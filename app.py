@@ -62,6 +62,35 @@ def get_battle_data(id):
     except requests.exceptions.RequestException as e:
         abort(500, description=f"Error connecting to the API: {str(e)}")
 
+@app.route("/clan/<string:id>")
+def get_clan_data(id):
+    url = f"https://proxy.royaleapi.dev/v1/clans/%23" + id
+    headers = {
+        'Accept': 'application/json',
+        'Authorization': f'Bearer {API_TOKEN}'
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+        # Check if the request was successful
+        if response.status_code == 200:
+            data = response.json()
+            return render_template("clan.html", player=data)
+        elif response.status_code == 404:
+            # Handle invalid player ID
+            abort(404, description="Clan not found")
+        elif response.status_code == 403:
+            # Handle authentication issues
+            abort(403, description="Invalid API token or access denied")
+        else:
+            # Handle other errors
+            abort(response.status_code, description=f"API request failed with status {response.status_code}")
+
+    except requests.exceptions.RequestException as e:
+        # Handle network or connection errors
+        abort(500, description=f"Error connecting to the API: {str(e)}")
+
+
 
 # Custom error handler for better user feedback
 @app.errorhandler(404)
