@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clash Royale Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen">
+    <div class="container mx-auto p-4 sm:p-6">
+        <div class="bg-gray-800 rounded-xl shadow-lg p-6">
+            <h1 class="text-4xl font-extrabold text-blue-400 mb-6 text-center">Clash Royale Dashboard</h1>
+            <p class="text-gray-300 mb-6 text-center">Explore clans, players, and battle logs for Clash Royale.</p>
+
+            <!-- Search Bar -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-blue-400 mb-4">Search by ID</h2>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <select id="searchType" class="bg-gray-700 text-gray-100 border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="clan">Clan</option>
+                        <option value="player">Player</option>
+                        <option value="log">Battle Log</option>
+                    </select>
+                    <input
+                        type="text"
+                        id="searchId"
+                        placeholder="Enter ID (e.g., CL0GYY8UP)"
+                        class="bg-gray-700 text-gray-100 border border-gray-600 rounded-lg p-2 flex-grow focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    >
+                    <button
+                        onclick="handleSearch()"
+                        class="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                    >
+                        Search
+                    </button>
+                </div>
+                <p class="text-gray-400 mt-2 text-sm">Enter a valid clan or player ID to view details. Ensure correct format to avoid errors.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleSearch() {
+            const searchType = document.getElementById('searchType').value;
+            const searchId = document.getElementById('searchId').value.trim();
+
+            if (!searchId) {
+                alert('Please enter a valid ID.');
+                return;
+            }
+
+            let url;
+            switch (searchType) {
+                case 'clan':
+                    url = `/clan/${encodeURIComponent(searchId)}`;
+                    break;
+                case 'player':
+                    url = `/players/${encodeURIComponent(searchId)}`;
+                    break;
+                case 'log':
+                    url = `/log/${encodeURIComponent(searchId)}`;
+                    break;
+                default:
+                    alert('Invalid search type.');
+                    return;
+            }
+
+            window.location.href = url;
+        }
+
+        // Allow pressing Enter to trigger search
+        document.getElementById('searchId').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                handleSearch();
+            }
+        });
+    </script>
+</body>
+</html>

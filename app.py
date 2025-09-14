@@ -49,15 +49,14 @@ def get_battle_data(id):
 
     try:
         response = requests.get(url, headers=headers)
-        if response.status_code == 200:
+        print(response.status_code)
+        print(response.json())
+        if response.json() != []:
             data = response.json()
             return render_template("battle_log.html", battles=data)
-        elif response.status_code == 404:
-            abort(404, description="Battle log not found")
-        elif response.status_code == 403:
-            abort(403, description="Invalid API token or access denied")
         else:
-            abort(response.status_code, description=f"API request failed with status {response.status_code}")
+            abort(404, description="Battle log not found")
+
 
     except requests.exceptions.RequestException as e:
         abort(500, description=f"Error connecting to the API: {str(e)}")
@@ -72,6 +71,7 @@ def get_clan_data(id):
 
     try:
         response = requests.get(url, headers=headers)
+
         # Check if the request was successful
         if response.status_code == 200:
             data = response.json()
@@ -91,7 +91,9 @@ def get_clan_data(id):
         abort(500, description=f"Error connecting to the API: {str(e)}")
 
 
-
+@app.route("/")
+def home():
+    return render_template("home.html")
 # Custom error handler for better user feedback
 @app.errorhandler(404)
 def not_found(error):
